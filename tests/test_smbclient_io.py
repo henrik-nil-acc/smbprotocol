@@ -7,6 +7,13 @@ import pytest
 
 import smbclient._io as io
 from smbclient._io import SMBRawIO
+from smbprotocol.exceptions import (
+    AccessDenied,
+    BadNetworkName,
+    ObjectNameNotFound,
+    SMBOSError,
+)
+from smbprotocol.header import NtStatus
 
 
 @pytest.fixture
@@ -39,3 +46,24 @@ def test_del_emits_resource_warning_for_leaked_handle(raw):
 
     with pytest.warns(ResourceWarning, match=r"unclosed SMB handle"):
         raw.__del__()
+
+
+@pytest.mark.parametrize(
+    ("exc_factory", "expected_status"),
+    [
+        (BadNetworkName, NtStatus.STATUS_BAD_NETWORK_NAME),
+        (ObjectNameNotFound, NtStatus.STATUS_OBJECT_NAME_NOT_FOUND),
+        (AccessDenied, NtStatus.STATUS_ACCESS_DENIED),
+    ],
+)
+def test_raw_io_translates_smb_response_to_os_error(mocker, exc_factory, expected_status):
+    # Anything escaping get_smb_tree here must surface as OSError so the
+    # rmtree, remove, rmdir, and scandir error paths route it correctly.
+    mocker.patch.object(io, "get_smb_tree", side_effect=exc_factory())
+
+    path = r"\\server\share\missing"
+    with pytest.raises(SMBOSError) as exc_info:
+        io.SMBRawIO(path)
+
+    assert exc_info.value.ntstatus == expected_status
+    assert exc_info.value.filename == path
