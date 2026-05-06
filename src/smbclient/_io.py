@@ -9,6 +9,7 @@ from smbclient._pool import ClientConfig, dfs_request, get_smb_tree
 from smbprotocol import MAX_PAYLOAD_SIZE
 from smbprotocol.exceptions import (
     NoMoreFiles,
+    NoSuchFile,
     ObjectNameNotFound,
     ObjectPathNotFound,
     PathNotCovered,
@@ -657,7 +658,9 @@ class SMBDirectoryIO(SMBRawIO):
         while True:
             try:
                 entries = self.fd.query_directory(pattern, info_class, flags=query_flags)
-            except NoMoreFiles:
+            except (NoMoreFiles, NoSuchFile):
+                # MS-SMB2 3.3.5.18 lists both STATUS_NO_MORE_FILES and STATUS_NO_SUCH_FILE
+                # as common QUERY_DIRECTORY codes. Treat either as end of enumeration.
                 break
             except (PathNotCovered, ObjectNameNotFound, ObjectPathNotFound):
                 # The MS-DFSC docs state that STATUS_PATH_NOT_COVERED is used when encountering a DFS link to a
