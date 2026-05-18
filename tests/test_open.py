@@ -23,7 +23,14 @@ from smbprotocol.create_contexts import (
     SMB2CreateResponseLeaseV2,
     SMB2CreateTimewarpToken,
 )
-from smbprotocol.exceptions import EndOfFile, SMBException, SMBUnsupportedFeature
+from smbprotocol.exceptions import (
+    AccessDenied,
+    EndOfFile,
+    FileClosed,
+    SMBException,
+    SMBResponseException,
+    SMBUnsupportedFeature,
+)
 from smbprotocol.file_info import (
     FileAttributes,
     FileEndOfFileInformation,
@@ -69,6 +76,16 @@ from smbprotocol.open import (
 )
 from smbprotocol.session import Session
 from smbprotocol.tree import TreeConnect
+
+
+@pytest.fixture
+def closing_open(mocker):
+    """Open-shaped mock with the state `_close_response` mutates."""
+    open_obj = mocker.MagicMock()
+    open_obj._connected = True
+    open_obj.file_id = mocker.sentinel.file_id
+    open_obj.tree_connect.session.open_table = {open_obj.file_id: open_obj}
+    return open_obj
 
 
 class TestSMB2CreateRequest:
@@ -2534,3 +2551,45 @@ class TestOpen:
 
         finally:
             connection.disconnect(True)
+
+    def test_close_response_marks_disconnected_on_receive_failure(self, closing_open, mocker):
+        closing_open.connection.receive.side_effect = AccessDenied()
+
+        with pytest.raises(SMBResponseException):
+            Open._close_response(closing_open, mocker.MagicMock())
+
+        assert not closing_open._connected
+        assert not closing_open.tree_connect.session.open_table
+
+    def test_close_response_marks_disconnected_on_file_closed(self, closing_open, mocker):
+        closing_open.connection.receive.side_effect = FileClosed()
+
+        assert Open._close_response(closing_open, mocker.MagicMock()) is None
+        assert not closing_open._connected
+        assert not closing_open.tree_connect.session.open_table
+
+    def test_close_response_marks_disconnected_on_success(self, closing_open, mocker):
+        closing_open.connection.receive.return_value = mocker.MagicMock()
+        mocker.patch("smbprotocol.open.SMB2CloseResponse")
+        close_req_cls = mocker.patch("smbprotocol.open.SMB2CloseRequest")
+        close_req_cls.return_value.__getitem__.return_value.has_flag.return_value = False
+
+        Open._close_response(closing_open, mocker.MagicMock())
+
+        assert not closing_open._connected
+        assert not closing_open.tree_connect.session.open_table
+
+    def test_close_response_skips_open_table_cleanup_for_unregistered_file_id(self, mocker):
+        # A failed CREATE in a related compound leaves file_id as the
+        # ChainedFileId sentinel; cleanup must not KeyError.
+        open_obj = mocker.MagicMock()
+        open_obj._connected = True
+        open_obj.file_id = Open._RELATED_COMPOUND_FILE_ID
+        open_obj._RELATED_COMPOUND_FILE_ID = Open._RELATED_COMPOUND_FILE_ID
+        open_obj.tree_connect.session.open_table = {}
+        open_obj.connection.receive.side_effect = FileClosed()
+
+        Open._close_response(open_obj, mocker.MagicMock())
+
+        assert not open_obj._connected
+        assert not open_obj.tree_connect.session.open_table
