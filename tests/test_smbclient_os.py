@@ -2170,3 +2170,45 @@ def test_dfs_nonexisting_path(smb_dfs_share):
 
     with pytest.raises(SMBOSError):
         smbclient.lstat(fake_file)
+
+
+class _StubScandirGen:
+    """Stand-in for the _scandir() generator. Records close() calls."""
+
+    def __init__(self, closes, next_exc=None):
+        self._closes = closes
+        self._next_exc = next_exc
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._next_exc is not None:
+            raise self._next_exc
+        raise StopIteration
+
+    def close(self):
+        self._closes.append(True)
+
+
+def test_scandir_closes_underlying_generator_on_context_exit(monkeypatch):
+    closes = []
+    monkeypatch.setattr("smbclient._os._scandir", lambda *a, **kw: _StubScandirGen(closes))
+
+    with smbclient.scandir(r"\\server\share\dir"):
+        pass
+
+    assert closes == [True]
+
+
+def test_walk_closes_scandir_iterator_on_unhandled_exception(monkeypatch):
+    closes = []
+    monkeypatch.setattr(
+        "smbclient._os._scandir",
+        lambda *a, **kw: _StubScandirGen(closes, RuntimeError("simulated mid-iter failure")),
+    )
+
+    with pytest.raises(RuntimeError, match="simulated mid-iter failure"):
+        list(smbclient.walk(r"\\server\share\dir"))
+
+    assert closes == [True]

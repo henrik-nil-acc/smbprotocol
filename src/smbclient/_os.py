@@ -666,10 +666,47 @@ def rmdir(path, **kwargs):
     _delete(SMBDirectoryIO, path, **kwargs)
 
 
-def scandir(path, search_pattern="*", **kwargs):
+class _ScandirIterator:
+    """Iterator over SMB directory entries with `with`-driven close.
+
+    Same shape as stdlib `os.scandir()`'s return type: iterable directly, and
+    usable as a context manager. Exiting the `with` block releases the SMB
+    directory handle on the spot. Without `with`, the handle stays open until
+    GC finalizes the underlying generator.
+    """
+
+    __slots__ = ("_gen",)
+
+    def __init__(self, gen: t.Generator[SMBDirEntry, None, None]) -> None:
+        self._gen = gen
+
+    def __iter__(self) -> _ScandirIterator:
+        return self
+
+    def __next__(self) -> SMBDirEntry:
+        return next(self._gen)
+
+    def __enter__(self) -> _ScandirIterator:
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.close()
+
+    def close(self) -> None:
+        self._gen.close()
+
+
+def scandir(path: str, search_pattern: str = "*", **kwargs: t.Any) -> _ScandirIterator:
     """
     Return an iterator of DirEntry objects corresponding to the entries in the directory given by path. The entries are
     yielded in arbitrary order, and the special entries '.' and '..' are not included.
+
+    Mirrors stdlib `os.scandir()`: the returned iterator also supports the context-manager protocol so callers can
+    release the SMB directory handle deterministically:
+
+        with smbclient.scandir(path) as it:
+            for entry in it:
+                ...
 
     Using scandir() instead of listdir() can significantly increase the performance of code that also needs file type
     or file attribute information, because DirEntry objects expose this information if the SMB server provides it when
@@ -678,11 +715,15 @@ def scandir(path, search_pattern="*", **kwargs):
     Python documentation for how DirEntry is set up and the methods and attributes that are available.
 
     :param path: The path to a directory to scan.
-    :param search_pattern: THe search string to match against the names of directories or files. This pattern can use
+    :param search_pattern: The search string to match against the names of directories or files. This pattern can use
     '*' as a wildcard for multiple chars and '?' as a wildcard for a single char. Does not support regex patterns.
     :param kwargs: Common SMB Session arguments for smbclient.
-    :return: An iterator of DirEntry objects in the directory.
+    :return: A context-manager iterator of DirEntry objects in the directory.
     """
+    return _ScandirIterator(_scandir(path, search_pattern, **kwargs))
+
+
+def _scandir(path, search_pattern="*", **kwargs):
     connection_cache = kwargs.get("connection_cache", None)
     with SMBDirectoryIO(path, share_access="rwd", **kwargs) as fd:
         for raw_dir_info in fd.query_directory(search_pattern, FileInformationClass.FILE_ID_FULL_DIRECTORY_INFORMATION):
@@ -1023,26 +1064,27 @@ def walk(top, topdown=True, onerror=None, follow_symlinks=False, **kwargs):
     dirs = []
     files = []
     bottom_up_dirs = []
-    while True:
-        try:
+    with scandir_gen:
+        while True:
             try:
-                entry = next(scandir_gen)
-            except StopIteration:
-                break
-        except OSError as err:
-            if onerror is not None:
-                onerror(err)
-            return
+                try:
+                    entry = next(scandir_gen)
+                except StopIteration:
+                    break
+            except OSError as err:
+                if onerror is not None:
+                    onerror(err)
+                return
 
-        if not entry.is_dir():
-            files.append(entry.name)
-            continue
+            if not entry.is_dir():
+                files.append(entry.name)
+                continue
 
-        dirs.append(entry.name)
-        if not topdown and (follow_symlinks or not entry.is_symlink()):
-            # Add the directory to the bottom up list which is recursively walked below, we exclude symlink dirs if
-            # follow_symlinks is False.
-            bottom_up_dirs.append(entry.path)
+            dirs.append(entry.name)
+            if not topdown and (follow_symlinks or not entry.is_symlink()):
+                # Add the directory to the bottom up list which is recursively walked below, we exclude symlink dirs
+                # if follow_symlinks is False.
+                bottom_up_dirs.append(entry.path)
 
     walk_kwargs = {"topdown": topdown, "onerror": onerror, "follow_symlinks": follow_symlinks}
     walk_kwargs.update(kwargs)

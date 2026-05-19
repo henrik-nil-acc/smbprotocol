@@ -1606,3 +1606,49 @@ def test_rmtree_islink_failure_invokes_onerror(mocker):
     assert callback_args[0][0].__name__ == "islink"
     assert callback_args[0][1] == fake_path
     assert isinstance(callback_args[0][2][1], SMBOSError)
+
+
+class _StubScandirGen:
+    """Stand-in for the _scandir() generator. Records close() calls."""
+
+    def __init__(self, closes, next_exc=None):
+        self._closes = closes
+        self._next_exc = next_exc
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._next_exc is not None:
+            raise self._next_exc
+        raise StopIteration
+
+    def close(self):
+        self._closes.append(True)
+
+
+def test_rmtree_closes_scandir_iterator_on_unhandled_exception(monkeypatch):
+    closes = []
+    monkeypatch.setattr(
+        "smbclient._os._scandir",
+        lambda *a, **kw: _StubScandirGen(closes, RuntimeError("simulated mid-iter failure")),
+    )
+    monkeypatch.setattr("smbclient.shutil.islink", lambda *a, **kw: False)
+
+    with pytest.raises(RuntimeError, match="simulated mid-iter failure"):
+        rmtree(r"\\server\share\dst")
+
+    assert closes == [True]
+
+
+def test_copytree_closes_scandir_iterator_on_unhandled_exception(monkeypatch):
+    closes = []
+    monkeypatch.setattr(
+        "smbclient._os._scandir",
+        lambda *a, **kw: _StubScandirGen(closes, RuntimeError("simulated mid-iter failure")),
+    )
+
+    with pytest.raises(RuntimeError, match="simulated mid-iter failure"):
+        copytree(r"\\server\share\src", r"\\server\share\dst")
+
+    assert closes == [True]
