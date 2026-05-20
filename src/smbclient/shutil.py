@@ -463,7 +463,7 @@ def _copy(src, dst, follow_symlinks, copy_meta_func, **kwargs):
 
 
 def _get_file_stat(path, follow_symlinks=True, **kwargs):
-    if path.startswith("//") or path.startswith("\\\\"):
+    if path.startswith(("//", "\\\\")):
         return smbclient_stat(path, follow_symlinks=follow_symlinks, **kwargs)
     else:
         # Source is a local path or accessible to the host, use the builtin os module to get the read only flag.

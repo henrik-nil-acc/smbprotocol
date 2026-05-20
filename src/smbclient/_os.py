@@ -118,7 +118,7 @@ def is_remote_path(path: str) -> bool:
     :param path: The filepath.
     :return: True iff the given path is a remote SMB path.
     """
-    return path.startswith("\\\\") or path.startswith("//")
+    return path.startswith(("\\\\", "//"))
 
 
 def copyfile(src, dst, **kwargs):

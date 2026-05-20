@@ -229,7 +229,6 @@ class Field(metaclass=ABCMeta):
             _get_calculated_value(self.value)
         :return: A byte string of the data once packed
         """
-        pass  # pragma: no cover
 
     @abstractmethod
     def _parse_value(self, value):
@@ -240,7 +239,6 @@ class Field(metaclass=ABCMeta):
         :param value: The value to parse
         :return: The value that has been parsed/casted to the correct value
         """
-        pass  # pragma: no cover
 
     @abstractmethod
     def _get_packed_size(self):
@@ -250,7 +248,6 @@ class Field(metaclass=ABCMeta):
 
         :return: The size of the field once it is packed
         """
-        pass  # pragma: no cover
 
     @abstractmethod
     def _to_string(self):
@@ -260,8 +257,6 @@ class Field(metaclass=ABCMeta):
 
         :return: string of the field value
         """
-        # creates a string which is a friendly representation of the value
-        pass  # pragma: no cover
 
     def _get_calculated_value(self, value):
         """
@@ -530,7 +525,7 @@ class ListField(Field):
             return self._create_list_from_bytes(list_count, list_type, value)
 
         list_value = []
-        for _ in range(0, list_count):
+        for _ in range(list_count):
             new_field = copy.deepcopy(list_type)
             value = new_field.unpack(value)
             list_value.append(new_field)

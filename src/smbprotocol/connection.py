@@ -303,7 +303,7 @@ class SMB3NegotiateRequest(Structure):
     def _negotiate_context_list(structure, data):
         context_count = structure["negotiate_context_count"].get_value()
         context_list = []
-        for _ in range(0, context_count):
+        for _ in range(context_count):
             field, data = SMB3NegotiateRequest._parse_negotiate_context_entry(data)
             context_list.append(field)
 
@@ -659,7 +659,7 @@ class SMB2NegotiateResponse(Structure):
     def _negotiate_context_list(structure, data):
         context_count = structure["negotiate_context_count"].get_value()
         context_list = []
-        for _ in range(0, context_count):
+        for _ in range(context_count):
             field, data = SMB2NegotiateResponse._parse_negotiate_context_entry(data)
             context_list.append(field)
 
