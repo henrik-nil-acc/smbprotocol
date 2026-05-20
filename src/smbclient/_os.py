@@ -1567,10 +1567,10 @@ class SMBDirEntry:
         # This is only used in shutil copytree so just recreate the dir info
         # from the stat result as best as we can.
         dir_info = SMBDirEntryInformation(
-            creation_time=datetime.datetime.fromtimestamp(file_stat.st_ctime),
-            last_access_time=datetime.datetime.fromtimestamp(file_stat.st_atime),
-            last_write_time=datetime.datetime.fromtimestamp(file_stat.st_mtime),
-            change_time=datetime.datetime.fromtimestamp(file_stat.st_chgtime),
+            creation_time=datetime.datetime.fromtimestamp(file_stat.st_ctime, tz=datetime.timezone.utc),
+            last_access_time=datetime.datetime.fromtimestamp(file_stat.st_atime, tz=datetime.timezone.utc),
+            last_write_time=datetime.datetime.fromtimestamp(file_stat.st_mtime, tz=datetime.timezone.utc),
+            change_time=datetime.datetime.fromtimestamp(file_stat.st_chgtime, tz=datetime.timezone.utc),
             end_of_file=file_stat.st_size,
             allocation_size=file_stat.st_size,  # Not part of the normal stat data
             file_attributes=file_stat.st_file_attributes,

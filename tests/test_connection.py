@@ -611,9 +611,11 @@ class TestSMB2NegotiateResponse:
         message["max_transact_size"] = 8388608
         message["max_read_size"] = 8388608
         message["max_write_size"] = 8388608
-        message["system_time"] = datetime(year=2017, month=11, day=15, hour=11, minute=32, second=12, microsecond=1616)
+        message["system_time"] = datetime(
+            year=2017, month=11, day=15, hour=11, minute=32, second=12, microsecond=1616, tzinfo=timezone.utc
+        )
         message["server_start_time"] = datetime(
-            year=2017, month=11, day=15, hour=11, minute=27, second=26, microsecond=349606
+            year=2017, month=11, day=15, hour=11, minute=27, second=26, microsecond=349606, tzinfo=timezone.utc
         )
         message["buffer"] = b"\x01\x02\x03\x04\x05\x06\x07\x08" b"\x09\x10"  # fmt: skip
 
@@ -649,9 +651,11 @@ class TestSMB2NegotiateResponse:
         message["max_transact_size"] = 8388608
         message["max_read_size"] = 8388608
         message["max_write_size"] = 8388608
-        message["system_time"] = datetime(year=2017, month=11, day=15, hour=11, minute=32, second=12, microsecond=1616)
+        message["system_time"] = datetime(
+            year=2017, month=11, day=15, hour=11, minute=32, second=12, microsecond=1616, tzinfo=timezone.utc
+        )
         message["server_start_time"] = datetime(
-            year=2017, month=11, day=15, hour=11, minute=27, second=26, microsecond=349606
+            year=2017, month=11, day=15, hour=11, minute=27, second=26, microsecond=349606, tzinfo=timezone.utc
         )
         message["buffer"] = b"\x01\x02\x03\x04\x05\x06\x07\x08" b"\x09\x10"  # fmt: skip
 

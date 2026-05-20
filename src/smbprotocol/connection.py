@@ -10,7 +10,7 @@ import struct
 import threading
 import time
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 from threading import Lock
 
 from cryptography.hazmat.backends import default_backend
@@ -1708,7 +1708,7 @@ class Request:
         """
         self.async_id = None
         self.message = message
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.now(tz=timezone.utc)
         self.cancelled = False
 
         # Used to contain the corresponding response from the server as the receiving in done in a separate thread.

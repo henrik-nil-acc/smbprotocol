@@ -630,7 +630,7 @@ class DateTimeField(Field):
 
     def _parse_value(self, value):
         if value is None:
-            datetime_value = datetime.datetime.today()
+            datetime_value = datetime.datetime.now(tz=datetime.timezone.utc)
         elif callable(value):
             datetime_value = value
         elif isinstance(value, bytes):
@@ -648,7 +648,7 @@ class DateTimeField(Field):
                 ) + datetime.timedelta(microseconds=time_microseconds)
             except OverflowError:
                 # This is unfortunately but 9999 is the max value a datetime can be so we just default to that
-                datetime_value = datetime.datetime.max
+                datetime_value = datetime.datetime.max.replace(tzinfo=datetime.timezone.utc)
 
         elif isinstance(value, datetime.datetime):
             datetime_value = value

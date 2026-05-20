@@ -1220,7 +1220,7 @@ class TestUuidField:
 
 
 class TestDateTimeField:
-    DATE = datetime(year=1993, month=6, day=11, hour=7, minute=52, second=34, microsecond=34)
+    DATE = datetime(year=1993, month=6, day=11, hour=7, minute=52, second=34, microsecond=34, tzinfo=timezone.utc)
 
     class StructureTest(Structure):
         def __init__(self):
@@ -1246,7 +1246,7 @@ class TestDateTimeField:
             ),
             (
                 b"\xff\xff\xff\xff\xff\xff\xff\xff",
-                datetime(9999, 12, 31, 23, 59, 59, 999999),
+                datetime(9999, 12, 31, 23, 59, 59, 999999, tzinfo=timezone.utc),
                 b"\xf6\x3f\xc0\xd1\x5e\x5a\xc8\x24",
             ),
         ],
@@ -1271,7 +1271,7 @@ class TestDateTimeField:
 
     def test_to_string(self):
         field = self.StructureTest()["field"]
-        expected = "1993-06-11 07:52:34.000034"
+        expected = "1993-06-11 07:52:34.000034+00:00"
         actual = str(field)
         assert actual == expected
 
@@ -1306,7 +1306,7 @@ class TestDateTimeField:
     def test_set_none(self):
         field = self.StructureTest()["field"]
         field.set_value(None)
-        expected = datetime.today()
+        expected = datetime.now(tz=timezone.utc)
         actual = field.get_value()
         assert isinstance(field.value, datetime)
         assert actual.year == expected.year
@@ -1413,7 +1413,7 @@ class TestDateTimeField:
 
     def test_set_datetime(self):
         field = self.StructureTest()["field"]
-        datetime_value = datetime(year=2017, month=11, day=14, hour=21, minute=38, second=46)
+        datetime_value = datetime(year=2017, month=11, day=14, hour=21, minute=38, second=46, tzinfo=timezone.utc)
         field.set_value(datetime_value)
         actual = field.get_value()
         assert isinstance(field.value, datetime)
