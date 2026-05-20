@@ -9,7 +9,6 @@ import os
 import struct
 import threading
 import time
-import typing as t
 from collections import OrderedDict
 from datetime import datetime
 from threading import Lock
@@ -835,7 +834,7 @@ class Connection:
         self.preauth_integrity_hash_value = []
         # Table of raw header bytes for unauthenticated session setup messages,
         # indexed by message_id.
-        self.preauth_integrity_session_hash_value: t.Dict[int, t.List[bytes]] = {}
+        self.preauth_integrity_session_hash_value: dict[int, list[bytes]] = {}
 
         # The cipher object that was negotiated
         self.cipher_id = None

@@ -4,7 +4,7 @@
 import hashlib
 import logging
 from collections import OrderedDict
-from typing import Literal, Optional
+from typing import Literal
 
 import spnego
 from cryptography.hazmat.backends import default_backend
@@ -173,8 +173,8 @@ class Session:
     def __init__(
         self,
         connection,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
+        username: str | None = None,
+        password: str | None = None,
         require_encryption=True,
         hostname_override=None,
         auth_protocol: Literal["negotiate", "ntlm", "kerberos"] = "negotiate",

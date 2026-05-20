@@ -7,7 +7,7 @@ import atexit
 import logging
 import ntpath
 import uuid
-from typing import ClassVar, Literal, Optional
+from typing import ClassVar, Literal
 
 from smbprotocol._text import to_text
 from smbprotocol.connection import Capabilities, Connection
@@ -379,10 +379,10 @@ def get_smb_tree(
 
 def register_session(
     server: str,
-    username: Optional[str] = None,
-    password: Optional[str] = None,
+    username: str | None = None,
+    password: str | None = None,
     port=445,
-    encrypt: Optional[bool] = None,
+    encrypt: bool | None = None,
     connection_timeout=60,
     connection_cache=None,
     auth_protocol: Literal["negotiate", "ntlm", "kerberos"] = "negotiate",

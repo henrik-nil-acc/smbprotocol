@@ -812,7 +812,7 @@ class SMB2LockElement(Structure):
                 ("reserved", IntField(size=4, default=0)),
             ]
         )
-        super(SMB2LockElement, self).__init__()
+        super().__init__()
 
 
 class SMB2LockRequest(Structure):
@@ -840,7 +840,7 @@ class SMB2LockRequest(Structure):
                 ),
             ]
         )
-        super(SMB2LockRequest, self).__init__()
+        super().__init__()
 
 
 class SMB2LockResponse(Structure):
@@ -859,7 +859,7 @@ class SMB2LockResponse(Structure):
                 ("reserved", IntField(size=2, default=0)),
             ]
         )
-        super(SMB2LockResponse, self).__init__()
+        super().__init__()
 
 
 class SMB2QueryDirectoryResponse(Structure):

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import time
 from collections import OrderedDict, namedtuple
-from typing import Iterator
+from collections.abc import Iterator
 
 from smbprotocol.structure import (
     BytesField,
