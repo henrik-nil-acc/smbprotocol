@@ -1124,7 +1124,7 @@ class Connection:
                     [r.response_event.wait() for r in new_requests]
 
                     # Update the old requests with the new response information
-                    for i, old_request in enumerate([request] + related_requests):
+                    for i, old_request in enumerate([request, *related_requests]):
                         del self.outstanding_requests[old_request.message["message_id"].get_value()]
                         old_request.update_request(new_requests[i])
 
@@ -1331,7 +1331,7 @@ class Connection:
         if related:
             requests[0].related_ids = [r.message["message_id"].get_value() for r in requests][1:]
 
-        if session and session.encrypt_data or tree and tree.encrypt_data:
+        if (session and session.encrypt_data) or (tree and tree.encrypt_data):
             send_data = self._encrypt(send_data, session)
 
         self._check_worker_running()
@@ -1585,7 +1585,7 @@ class Connection:
         self.negotiated_dialects = neg_req["dialects"] = negotiated_dialects
         log.info(
             "Negotiating with SMB2 protocol with highest client dialect of: %s",
-            [dialect for dialect, v in vars(Dialects).items() if v == highest_dialect][0],
+            next(dialect for dialect, v in vars(Dialects).items() if v == highest_dialect),
         )
 
         neg_req["security_mode"] = self.client_security_mode

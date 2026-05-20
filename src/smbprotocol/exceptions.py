@@ -9,7 +9,7 @@ import ntpath
 import os
 import socket
 from collections import OrderedDict
-from typing import Any
+from typing import Any, ClassVar
 
 from smbprotocol import Dialects
 from smbprotocol._text import to_bytes, to_text
@@ -157,7 +157,8 @@ class SMBUnsupportedFeature(SMBException):
 
 
 class _SMBErrorRegistry(type):
-    __registry = {}
+    # Metaclass-wide map of NtStatus -> exception subclass, populated as subclasses are defined.
+    __registry: ClassVar[dict] = {}
 
     def __init__(cls, name, bases, attributes):
         super().__init__(name, bases, attributes)

@@ -58,7 +58,7 @@ def getmtime(path, **kwargs):
 
 def getctime(path, **kwargs):
     """
-    Return the system’s ctime which is the creation time for path. The return value is a number giving the number of
+    Return the system's ctime which is the creation time for path. The return value is a number giving the number of
     seconds since the epoch (see the time module). Raise OSError if the file does not exist or is inaccessible.
 
     :param path: The path to get the ctime for.

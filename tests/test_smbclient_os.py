@@ -1045,7 +1045,7 @@ def test_rename_fail_dst_not_absolute(smb_share):
 
 def test_rename_fail_dst_different_root(smb_share):
     expected = "Cannot rename a file to a different root than the src."
-    server = [p for p in ntpath.normpath(smb_share).split("\\") if p][0]
+    server = next(p for p in ntpath.normpath(smb_share).split("\\") if p)
 
     with pytest.raises(ValueError, match=re.escape(expected)):
         smbclient.rename(smb_share, "\\\\%s\\dfs\\dst" % server)

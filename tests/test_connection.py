@@ -1195,7 +1195,7 @@ class TestConnection:
             header["flags"].set_flag(Smb2Flags.SMB2_FLAGS_SIGNED)
             header["signature"] = b"\xff" * 16
             with pytest.raises(SMBException) as exc:
-                connection.verify_signature(header, list(connection.session_table.keys())[0], force=True)
+                connection.verify_signature(header, next(iter(connection.session_table)), force=True)
             assert "Server message signature could not be verified:" in str(exc.value)
         finally:
             connection.disconnect(True)

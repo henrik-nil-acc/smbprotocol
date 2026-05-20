@@ -2416,7 +2416,7 @@ class TestOpen:
                 CreateDisposition.FILE_OVERWRITE_IF,
                 CreateOptions.FILE_NON_DIRECTORY_FILE,
             )
-            read_req, unpack_func = open.write(b"\x00", 0, send=False)
+            read_req, _ = open.write(b"\x00", 0, send=False)
             req = connection.send(read_req, sid=session.session_id, tid=tree.tree_connect_id)
             # get the response so we know the timeout will fail next as there
             # is no response to get

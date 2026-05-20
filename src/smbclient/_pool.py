@@ -7,7 +7,7 @@ import atexit
 import logging
 import ntpath
 import uuid
-from typing import Literal, Optional
+from typing import ClassVar, Literal, Optional
 
 from smbprotocol._text import to_text
 from smbprotocol.connection import Capabilities, Connection
@@ -34,7 +34,8 @@ _SMB_CONNECTIONS = {}
 
 
 class _ConfigSingleton(type):
-    __instances = {}
+    # Metaclass-wide singleton registry: one entry per class that uses _ConfigSingleton.
+    __instances: ClassVar[dict] = {}
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls.__instances:
