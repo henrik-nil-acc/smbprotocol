@@ -58,7 +58,7 @@ line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["B", "C4", "E", "F", "I", "PIE", "RUF", "SIM", "UP", "W"]
+select = ["B", "C4", "E", "F", "I", "PIE", "RSE", "RUF", "SIM", "UP", "W"]
 ignore = ["UP031"]  # eager %-format in log calls — fix as lazy logging instead
 
 [tool.ruff.lint.per-file-ignores]

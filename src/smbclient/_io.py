@@ -143,7 +143,7 @@ def _resolve_dfs(raw_io):
     client_config.cache_referral(referral)
     info = client_config.lookup_referral([p for p in raw_path.split("\\") if p])
     if not info:
-        raise ObjectPathNotFound()
+        raise ObjectPathNotFound
 
     connection_kwargs = getattr(raw_io, f"_{SMBRawIO.__name__}__kwargs", {})
 

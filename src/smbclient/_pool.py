@@ -306,7 +306,7 @@ def get_smb_tree(
             client_config.cache_referral(referral_response)
             referral = client_config.lookup_referral(path_split)
             if not referral:
-                raise ObjectPathNotFound()
+                raise ObjectPathNotFound
 
             path = path.replace(referral.dfs_path, referral.target_hint.target_path, 1)
             path_split = [p for p in path.split("\\") if p]
@@ -357,7 +357,7 @@ def get_smb_tree(
 
             # Sometimes a DFS referral may return 0 referrals, this needs to be checked here to avoid repeats.
             if not client_config.lookup_referral(path_split):
-                raise ObjectPathNotFound() from err
+                raise ObjectPathNotFound from err
 
             return get_smb_tree(path, **get_kwargs)
 
