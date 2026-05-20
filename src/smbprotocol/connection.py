@@ -1159,7 +1159,7 @@ class Connection:
         :param credit_request: The number of credits to request
         :return: the credits that were granted by the server
         """
-        log.info("Sending Echo request with a timeout of %d and credit request of %d" % (timeout, credit_request))
+        log.info("Sending Echo request with a timeout of %d and credit request of %d", timeout, credit_request)
 
         echo_msg = SMB2Echo()
         log.debug(echo_msg)
@@ -1167,7 +1167,7 @@ class Connection:
 
         log.info("Receiving Echo response")
         response = self.receive(req, timeout=timeout)
-        log.info("Credits granted from the server echo response: %d" % response["credit_response"].get_value())
+        log.info("Credits granted from the server echo response: %d", response["credit_response"].get_value())
         echo_resp = SMB2Echo()
         echo_resp.unpack(response["data"].get_value())
         log.debug(echo_resp)
@@ -1618,7 +1618,7 @@ class Connection:
             netname_id["context_type"] = NegotiateContextType.SMB2_NETNAME_NEGOTIATE_CONTEXT_ID
             netname_id["data"] = SMB2NetnameNegotiateContextId()
             netname_id["data"]["net_name"] = self.server_name
-            log.debug(f"Adding netname context id of {self.server_name} to negotiate request")
+            log.debug("Adding netname context id of %s to negotiate request", self.server_name)
 
             signing_cap = SMB2NegotiateContextRequest()
             signing_cap["context_type"] = NegotiateContextType.SMB2_SIGNING_CAPABILITIES

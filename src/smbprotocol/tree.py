@@ -237,7 +237,7 @@ class TreeConnect:
             verify the negotiation parameters with the server to prevent
             SMB downgrade attacks
         """
-        log.info(f"Session: {self.session.username} - Creating connection to share {self.share_name}")
+        log.info("Session: %s - Creating connection to share %s", self.session.username, self.share_name)
         utf_share_name = self.share_name.encode("utf-16-le")
         connect = SMB2TreeConnectRequest()
         connect["buffer"] = utf_share_name
@@ -278,14 +278,14 @@ class TreeConnect:
         if not self._connected:
             return
 
-        log.info(f"Session: {self.session.username}, Tree: {self.share_name} - Disconnecting from Tree Connect")
+        log.info("Session: %s, Tree: %s - Disconnecting from Tree Connect", self.session.username, self.share_name)
 
         req = SMB2TreeDisconnect()
-        log.info(f"Session: {self.session.username}, Tree: {self.share_name} - Sending Tree Disconnect message")
+        log.info("Session: %s, Tree: %s - Sending Tree Disconnect message", self.session.username, self.share_name)
         log.debug(req)
         request = self.session.connection.send(req, sid=self.session.session_id, tid=self.tree_connect_id)
 
-        log.info(f"Session: {self.session.username}, Tree: {self.share_name} - Receiving Tree Disconnect response")
+        log.info("Session: %s, Tree: %s - Receiving Tree Disconnect response", self.session.username, self.share_name)
         res = self.session.connection.receive(request)
         res_disconnect = SMB2TreeDisconnect()
         res_disconnect.unpack(res["data"].get_value())

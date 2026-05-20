@@ -125,7 +125,7 @@ class Tcp:
         offset = 0
         while offset < length:
             read_len = length - offset
-            log.debug(f"Socket recv({read_len}) (total {length})")
+            log.debug("Socket recv(%d) (total %d)", read_len, length)
 
             start_time = timeit.default_timer()
 
@@ -155,7 +155,7 @@ class Tcp:
                     b_data = b""
 
             read_len = len(b_data)
-            log.debug(f"Socket recv() returned {read_len} bytes (total {length})")
+            log.debug("Socket recv() returned %d bytes (total %d)", read_len, length)
 
             if read_len == 0:
                 self.close()
