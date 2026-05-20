@@ -1923,7 +1923,7 @@ def test_walk_topdown(smb_share):
 
     scanned_files = []
     scanned_dirs = []
-    for root, dirs, files in smbclient.walk(smb_share):
+    for _root, dirs, files in smbclient.walk(smb_share):
         scanned_dirs.append(dirs[0])
 
         # Test out removing a dir entry will affect the further walks.
@@ -1944,7 +1944,7 @@ def test_walk_bottomup(smb_share):
 
     scanned_files = []
     scanned_dirs = []
-    for root, dirs, files in smbclient.walk(smb_share, topdown=False):
+    for _root, dirs, files in smbclient.walk(smb_share, topdown=False):
         if dirs:
             scanned_dirs.append(dirs[0])
         scanned_files.append(files[0])

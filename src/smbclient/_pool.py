@@ -351,13 +351,13 @@ def get_smb_tree(
                 # This provides better context as to why a failure occured, i.e.
                 # a bad share path was provided.
                 # https://github.com/jborean93/smbprotocol/issues/196
-                raise err
+                raise err from None
 
             client_config.cache_referral(referral)
 
             # Sometimes a DFS referral may return 0 referrals, this needs to be checked here to avoid repeats.
             if not client_config.lookup_referral(path_split):
-                raise ObjectPathNotFound()
+                raise ObjectPathNotFound() from err
 
             return get_smb_tree(path, **get_kwargs)
 

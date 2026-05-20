@@ -67,7 +67,7 @@ class Structure:
         raw_hex = _bytes_to_hex(self.pack(), True, hex_per_line=0)
         field_strings = []
 
-        for name, field in self.fields.items():
+        for field in self.fields.values():
             # the field header is slightly different for a StructureField
             # remove the leading space and put the value on the next line
             if isinstance(field, StructureField):
@@ -118,7 +118,7 @@ class Structure:
 
     def unpack(self, data):
         mem = memoryview(data)
-        for key, field in self.fields.items():
+        for field in self.fields.values():
             mem = field.unpack(mem)
         return bytes(mem)  # remaining data
 
@@ -400,7 +400,7 @@ class BytesField(Field):
 
 
 class ListField(Field):
-    def __init__(self, list_count=None, list_type=BytesField(), unpack_func=None, **kwargs):
+    def __init__(self, list_count=None, list_type=None, unpack_func=None, **kwargs):
         """
         Used to store a list of values that are the same time, the list can
         contain both fixed length values or variable length values but the
@@ -426,6 +426,9 @@ class ListField(Field):
             used when the list contains variable length values.
         :param kwargs: Any other kwarg to be sent to Field()
         """
+        if list_type is None:
+            list_type = BytesField()
+
         if list_count is not None and not (isinstance(list_count, int) or callable(list_count)):
             raise InvalidFieldDefinition(
                 "ListField list_count must be an int, lambda, or None for a variable list length"
@@ -465,8 +468,8 @@ class ListField(Field):
 
     def _pack_value(self, value):
         data = b""
-        for value in list(value):
-            data += value.pack()
+        for item in list(value):
+            data += item.pack()
         return data
 
     def _parse_value(self, value):
@@ -530,7 +533,7 @@ class ListField(Field):
             return self._create_list_from_bytes(list_count, list_type, value)
 
         list_value = []
-        for idx in range(0, list_count):
+        for _ in range(0, list_count):
             new_field = copy.deepcopy(list_type)
             value = new_field.unpack(value)
             list_value.append(new_field)

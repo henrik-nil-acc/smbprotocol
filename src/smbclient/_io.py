@@ -439,7 +439,7 @@ class SMBRawIO(io.RawIOBase):
             return
         if closed:
             return
-        warnings.warn(f"unclosed SMB handle {self._name!r}", ResourceWarning, source=self)
+        warnings.warn(f"unclosed SMB handle {self._name!r}", ResourceWarning, stacklevel=2, source=self)
 
     def __enter__(self):
         self.open()
