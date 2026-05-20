@@ -29,7 +29,7 @@ def _bytes_to_hex(bytes, pretty=False, hex_per_line=8):
             hex_list = [hex]
         else:
             idx = hex_per_line * 2
-            hex_list = list(hex[i : i + idx] for i in range(0, len(hex), idx))
+            hex_list = [hex[i : i + idx] for i in range(0, len(hex), idx)]
 
         hexes = []
         for h in hex_list:

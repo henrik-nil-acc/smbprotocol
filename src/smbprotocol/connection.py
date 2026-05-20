@@ -779,10 +779,10 @@ class Connection:
 
         # Table of Requests that have yet to be picked up by the application,
         # it MAY contain a response from the server as well
-        self.outstanding_requests = dict()
+        self.outstanding_requests = {}
 
         # Table of available sequence numbers
-        self.sequence_window = dict(low=0, high=1)
+        self.sequence_window = {"low": 0, "high": 1}
         self.sequence_lock = Lock()
 
         # Byte array containing the negotiate token and remembered for

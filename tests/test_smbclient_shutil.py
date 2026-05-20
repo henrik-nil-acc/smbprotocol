@@ -1052,10 +1052,10 @@ def test_copytree_missing_dst(smb_share):
 
     assert actual == dst_dirname
 
-    assert sorted(list(listdir(dst_dirname))) == ["dir1", "file1.txt"]
-    assert sorted(list(listdir("%s\\dir1" % dst_dirname))) == ["file2.txt", "subdir1"]
-    assert sorted(list(listdir("%s\\dir1\\subdir1" % dst_dirname))) == ["file3.txt", "subdir2"]
-    assert sorted(list(listdir("%s\\dir1\\subdir1\\subdir2" % dst_dirname))) == []
+    assert sorted(listdir(dst_dirname)) == ["dir1", "file1.txt"]
+    assert sorted(listdir("%s\\dir1" % dst_dirname)) == ["file2.txt", "subdir1"]
+    assert sorted(listdir("%s\\dir1\\subdir1" % dst_dirname)) == ["file3.txt", "subdir2"]
+    assert sorted(listdir("%s\\dir1\\subdir1\\subdir2" % dst_dirname)) == []
 
     with open_file("%s\\file1.txt" % dst_dirname) as fd:
         assert fd.read() == "file1.txt"
@@ -1185,9 +1185,9 @@ def test_copytree_with_ignore(smb_share):
     actual = copytree(src_dirname, dst_dirname, ignore=ignore)
     assert actual == dst_dirname
 
-    assert sorted(list(listdir(dst_dirname))) == ["dir1"]
-    assert sorted(list(listdir("%s\\dir1" % dst_dirname))) == ["file2.txt", "subdir1"]
-    assert sorted(list(listdir("%s\\dir1\\subdir1" % dst_dirname))) == ["file3.txt"]
+    assert sorted(listdir(dst_dirname)) == ["dir1"]
+    assert sorted(listdir("%s\\dir1" % dst_dirname)) == ["file2.txt", "subdir1"]
+    assert sorted(listdir("%s\\dir1\\subdir1" % dst_dirname)) == ["file3.txt"]
 
     with open_file("%s\\dir1\\file2.txt" % dst_dirname) as fd:
         assert fd.read() == "file2.txt"
@@ -1210,9 +1210,9 @@ def test_copytree_with_local_dst(smb_share, tmp_path):
     actual = copytree(src_dirname, dst_dirname)
     assert actual == dst_dirname
 
-    assert sorted(list(os.listdir(dst_dirname))) == ["dir1", "file1.txt"]
-    assert sorted(list(os.listdir(os.path.join(dst_dirname, "dir1")))) == ["file2.txt", "subdir1"]
-    assert sorted(list(os.listdir(os.path.join(dst_dirname, "dir1", "subdir1")))) == ["file3.txt"]
+    assert sorted(os.listdir(dst_dirname)) == ["dir1", "file1.txt"]
+    assert sorted(os.listdir(os.path.join(dst_dirname, "dir1"))) == ["file2.txt", "subdir1"]
+    assert sorted(os.listdir(os.path.join(dst_dirname, "dir1", "subdir1"))) == ["file3.txt"]
 
     with open(os.path.join(dst_dirname, "file1.txt")) as fd:
         assert fd.read() == "file1.txt"
@@ -1237,9 +1237,9 @@ def test_copytree_with_local_src(smb_share, tmp_path):
     actual = copytree(src_dirname, dst_dirname)
     assert actual == dst_dirname
 
-    assert sorted(list(listdir(dst_dirname))) == ["dir1", "file1.txt"]
-    assert sorted(list(listdir("%s\\dir1" % dst_dirname))) == ["file2.txt", "subdir1"]
-    assert sorted(list(listdir("%s\\dir1\\subdir1" % dst_dirname))) == ["file3.txt"]
+    assert sorted(listdir(dst_dirname)) == ["dir1", "file1.txt"]
+    assert sorted(listdir("%s\\dir1" % dst_dirname)) == ["file2.txt", "subdir1"]
+    assert sorted(listdir("%s\\dir1\\subdir1" % dst_dirname)) == ["file3.txt"]
 
     with open_file("%s\\file1.txt" % dst_dirname) as fd:
         assert fd.read() == "file1.txt"
@@ -1280,10 +1280,10 @@ def test_copytree_with_copy(smb_share):
 
     assert actual == dst_dirname
 
-    assert sorted(list(listdir(dst_dirname))) == ["dir1", "file1.txt"]
-    assert sorted(list(listdir("%s\\dir1" % dst_dirname))) == ["file2.txt", "subdir1"]
-    assert sorted(list(listdir("%s\\dir1\\subdir1" % dst_dirname))) == ["file3.txt", "subdir2"]
-    assert sorted(list(listdir("%s\\dir1\\subdir1\\subdir2" % dst_dirname))) == []
+    assert sorted(listdir(dst_dirname)) == ["dir1", "file1.txt"]
+    assert sorted(listdir("%s\\dir1" % dst_dirname)) == ["file2.txt", "subdir1"]
+    assert sorted(listdir("%s\\dir1\\subdir1" % dst_dirname)) == ["file3.txt", "subdir2"]
+    assert sorted(listdir("%s\\dir1\\subdir1\\subdir2" % dst_dirname)) == []
 
     with open_file("%s\\file1.txt" % dst_dirname) as fd:
         assert fd.read() == "file1.txt"

@@ -246,11 +246,11 @@ def listdir(path, search_pattern="*", **kwargs):
     with SMBDirectoryIO(path, mode="r", share_access="r", **kwargs) as dir_fd:
         try:
             raw_filenames = dir_fd.query_directory(search_pattern, FileInformationClass.FILE_NAMES_INFORMATION)
-            return list(
+            return [
                 e["file_name"].get_value().decode("utf-16-le")
                 for e in raw_filenames
                 if e["file_name"].get_value().decode("utf-16-le") not in [".", ".."]
-            )
+            ]
         except NoSuchFile:
             return []
 
