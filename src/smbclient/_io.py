@@ -1,6 +1,7 @@
 # Copyright: (c) 2019, Jordan Borean (@jborean93) <jborean93@gmail.com>
 # MIT License (see LICENSE or https://opensource.org/licenses/MIT)
 
+import contextlib
 import io
 import logging
 import warnings
@@ -669,10 +670,8 @@ class SMBDirectoryIO(SMBRawIO):
                     # No DFS referral resolved; propagate the error.
                     raise
 
-                try:
+                with contextlib.suppress(SMBResponseException):
                     self.fd.close()
-                except SMBResponseException:
-                    pass
                 self.fd = smb_open
                 self.open()
                 query_flags = QueryDirectoryFlags.SMB2_RESTART_SCANS

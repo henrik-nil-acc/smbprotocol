@@ -38,16 +38,18 @@ if os.name == "nt":
 
 
 def _set_file_attributes(path, attributes):
-    with SMBRawIO(
-        path,
-        mode="rb",
-        create_options=CreateOptions.FILE_OPEN_REPARSE_POINT,
-        desired_access=FilePipePrinterAccessMask.FILE_WRITE_ATTRIBUTES,
-    ) as fd:
-        with SMBFileTransaction(fd) as transaction:
-            basic_info = FileBasicInformation()
-            basic_info["file_attributes"] = attributes
-            set_info(transaction, basic_info)
+    with (
+        SMBRawIO(
+            path,
+            mode="rb",
+            create_options=CreateOptions.FILE_OPEN_REPARSE_POINT,
+            desired_access=FilePipePrinterAccessMask.FILE_WRITE_ATTRIBUTES,
+        ) as fd,
+        SMBFileTransaction(fd) as transaction,
+    ):
+        basic_info = FileBasicInformation()
+        basic_info["file_attributes"] = attributes
+        set_info(transaction, basic_info)
 
 
 def copy_from_to(src_filename, dst_filename):
@@ -57,10 +59,7 @@ def copy_from_to(src_filename, dst_filename):
     with open_file(dst_filename) as fd:
         assert fd.read() == "content"
 
-    if is_remote_path(src_filename):
-        src_stat = smbclient_stat(src_filename)
-    else:
-        src_stat = os.stat(src_filename)
+    src_stat = smbclient_stat(src_filename) if is_remote_path(src_filename) else os.stat(src_filename)
 
     actual = smbclient_stat(dst_filename)
     assert actual.st_atime != src_stat.st_atime

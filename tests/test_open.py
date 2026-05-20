@@ -1623,12 +1623,8 @@ class TestOpen:
                 create_contexts,
             )
             assert len(out_cont) == 2
-            assert isinstance(out_cont[0], SMB2CreateQueryMaximalAccessResponse) or isinstance(
-                out_cont[0], SMB2CreateQueryOnDiskIDResponse
-            )
-            assert isinstance(out_cont[1], SMB2CreateQueryMaximalAccessResponse) or isinstance(
-                out_cont[1], SMB2CreateQueryOnDiskIDResponse
-            )
+            assert isinstance(out_cont[0], (SMB2CreateQueryMaximalAccessResponse, SMB2CreateQueryOnDiskIDResponse))
+            assert isinstance(out_cont[1], (SMB2CreateQueryMaximalAccessResponse, SMB2CreateQueryOnDiskIDResponse))
         finally:
             connection.disconnect(True)
 

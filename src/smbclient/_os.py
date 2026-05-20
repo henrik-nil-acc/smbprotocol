@@ -722,7 +722,7 @@ def scandir(path: str, search_pattern: str = "*", **kwargs: t.Any) -> SMBScandir
 
 
 def _scandir(path: str, search_pattern: str = "*", **kwargs: t.Any) -> t.Generator[SMBDirEntry, None, None]:
-    connection_cache = kwargs.get("connection_cache", None)
+    connection_cache = kwargs.get("connection_cache")
     with SMBDirectoryIO(path, share_access="rwd", **kwargs) as fd:
         for raw_dir_info in fd.query_directory(search_pattern, FileInformationClass.FILE_ID_FULL_DIRECTORY_INFORMATION):
             filename = raw_dir_info["file_name"].get_value().decode("utf-16-le")
@@ -1579,7 +1579,7 @@ class SMBDirEntry:
             file_name=path.split("\\")[-1],
         )
 
-        dir_entry = cls(SMBRawIO(path, **kwargs), dir_info, connection_cache=kwargs.get("connection_cache", None))
+        dir_entry = cls(SMBRawIO(path, **kwargs), dir_info, connection_cache=kwargs.get("connection_cache"))
         dir_entry._stat = file_stat
         return dir_entry
 

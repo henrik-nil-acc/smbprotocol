@@ -1123,9 +1123,8 @@ def test_replace_sharing_violation(smb_share):
         fd.write(b"test data")
 
     expected = re.escape("The process cannot access the file because it is being used by another process")
-    with smbclient.open_file(dst_file, mode="wb"):
-        with pytest.raises(SMBOSError, match=expected):
-            smbclient.replace(src_file, dst_file)
+    with smbclient.open_file(dst_file, mode="wb"), pytest.raises(SMBOSError, match=expected):
+        smbclient.replace(src_file, dst_file)
 
 
 def test_rmdir(smb_share):

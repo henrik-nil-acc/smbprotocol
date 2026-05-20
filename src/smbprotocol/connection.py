@@ -1363,7 +1363,7 @@ class Connection:
                             ) from ex
 
                     log.debug("Sending SMB2 Echo to keep connection alive")
-                    for sid in self.session_table.keys():
+                    for sid in self.session_table:
                         req = self.send(SMB2Echo(), sid=sid)
                         # Set this reserved field to 1 as we use that internally to check whether the outstanding
                         # requests queue should be cleared in this thread or not.
@@ -1495,10 +1495,7 @@ class Connection:
         header["session_id"] = session.session_id
 
         encryption_key = session.encryption_key
-        if self.dialect >= Dialects.SMB_3_1_1:
-            cipher_id = self.cipher_id
-        else:
-            cipher_id = Ciphers.AES_128_CCM
+        cipher_id = self.cipher_id if self.dialect >= Dialects.SMB_3_1_1 else Ciphers.AES_128_CCM
 
         if cipher_id in [Ciphers.AES_128_GCM, Ciphers.AES_256_GCM]:
             cipher = aead.AESGCM
@@ -1529,10 +1526,7 @@ class Connection:
         if session is None:
             raise SMBException(f"Failed to find valid session {session_id} for message decryption")
 
-        if self.dialect >= Dialects.SMB_3_1_1:
-            cipher_id = self.cipher_id
-        else:
-            cipher_id = Ciphers.AES_128_CCM
+        cipher_id = self.cipher_id if self.dialect >= Dialects.SMB_3_1_1 else Ciphers.AES_128_CCM
 
         if cipher_id in [Ciphers.AES_128_GCM, Ciphers.AES_256_GCM]:
             cipher = aead.AESGCM
@@ -1574,10 +1568,7 @@ class Connection:
                 if Dialects.SMB_3_0_2 in negotiated_dialects:
                     negotiated_dialects.remove(Dialects.SMB_3_0_2)
         else:
-            if dialect >= Dialects.SMB_3_1_1:
-                neg_req = SMB3NegotiateRequest()
-            else:
-                neg_req = SMB2NegotiateRequest()
+            neg_req = SMB3NegotiateRequest() if dialect >= Dialects.SMB_3_1_1 else SMB2NegotiateRequest()
             negotiated_dialects = [dialect]
 
         highest_dialect = sorted(negotiated_dialects)[-1]

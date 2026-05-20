@@ -61,7 +61,7 @@ class CreateContextName:
             return {
                 32: SMB2CreateResponseLease(),
                 52: SMB2CreateResponseLeaseV2(),
-            }.get(size, None)
+            }.get(size)
 
         return {
             CreateContextName.SMB2_CREATE_DURABLE_HANDLE_REQUEST: SMB2CreateDurableHandleResponse(),
@@ -72,7 +72,7 @@ class CreateContextName:
             CreateContextName.SMB2_CREATE_DURABLE_HANDLE_RECONNECT_V2: SMB2CreateDurableHandleReconnectV2,
             CreateContextName.SMB2_CREATE_APP_INSTANCE_ID: SMB2CreateAppInstanceId(),
             CreateContextName.SMB2_CREATE_APP_INSTANCE_VERSION: SMB2CreateAppInstanceVersion(),
-        }.get(name, None)
+        }.get(name)
 
 
 class EAFlags:

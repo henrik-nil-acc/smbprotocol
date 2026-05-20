@@ -287,7 +287,7 @@ class AclPacket(Structure):
                 AceType.ACCESS_ALLOWED_ACE_TYPE: AccessAllowedAce(),
                 AceType.ACCESS_DENIED_ACE_TYPE: AccessDeniedAce(),
                 AceType.SYSTEM_AUDIT_ACE_TYPE: SystemAuditAce(),
-            }.get(ace_type, None)
+            }.get(ace_type)
 
             if not ace_struct:
                 ace_size = struct.unpack("<H", data[2:4])[0]

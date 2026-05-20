@@ -314,7 +314,7 @@ class Field(metaclass=ABCMeta):
             size = size(self.structure)
 
         struct_format = {1: "B", 2: "H", 4: "L", 8: "Q"}
-        if size not in struct_format.keys():
+        if size not in struct_format:
             raise InvalidFieldDefinition(f"Cannot struct format of size {size}")
         format_char = struct_format[size]
         if not unsigned:
@@ -457,10 +457,7 @@ class ListField(Field):
         # Override default get_value() so we return a list with the actual
         # value, not the Field definition
         list_value = []
-        if callable(self.value):
-            value = self._get_calculated_value(self.value)
-        else:
-            value = self.value
+        value = self._get_calculated_value(self.value) if callable(self.value) else self.value
 
         for entry in value:
             list_value.append(entry.get_value())
@@ -577,11 +574,7 @@ class StructureField(Field):
     def _parse_value(self, value):
         if value is None:
             structure_value = b""
-        elif callable(value):
-            structure_value = value
-        elif isinstance(value, bytes):
-            structure_value = value
-        elif isinstance(value, Structure):
+        elif callable(value) or isinstance(value, (bytes, Structure)):
             structure_value = value
         else:
             raise TypeError(f"Cannot parse value for field {self.name} of type {type(value).__name__} to a structure")
@@ -712,9 +705,7 @@ class UuidField(Field):
             uuid_value = uuid.UUID(bytes_le=value)
         elif isinstance(value, int):
             uuid_value = uuid.UUID(int=value)
-        elif isinstance(value, uuid.UUID):
-            uuid_value = value
-        elif callable(value):
+        elif isinstance(value, uuid.UUID) or callable(value):
             uuid_value = value
         else:
             raise TypeError(f"Cannot parse value for field {self.name} of type {type(value).__name__} to a uuid")
@@ -854,9 +845,7 @@ class TextField(BytesField):
             text_value = ""
         elif isinstance(value, bytes):
             text_value = to_text(value, encoding=self.encoding)
-        elif isinstance(value, str):
-            text_value = value
-        elif callable(value):
+        elif isinstance(value, str) or callable(value):
             text_value = value
         else:
             raise TypeError(f"Cannot parse value for field {self.name} of type {type(value).__name__} to a text string")
