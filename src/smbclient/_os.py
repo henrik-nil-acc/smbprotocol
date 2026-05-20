@@ -609,7 +609,7 @@ def removedirs(name, **kwargs):
     while True:
         try:
             rmdir(remove_dir, **kwargs)
-        except (SMBResponseException, OSError):
+        except (SMBResponseException, OSError):  # noqa: PERF203  except exits the loop, not a per-iteration guard
             return
         else:
             remove_dir = ntpath.dirname(remove_dir)

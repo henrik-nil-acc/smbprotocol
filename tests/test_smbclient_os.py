@@ -1199,9 +1199,7 @@ def test_scandir_large(smb_share):
         dirname = str(i).zfill(255)
         smbclient.mkdir(ntpath.join(smb_share, "directory", dirname))
 
-    actual = []
-    for entry in smbclient.scandir(dir_path):
-        actual.append(entry.path)
+    actual = [entry.path for entry in smbclient.scandir(dir_path)]
 
     # Just a test optimisation, remove all the dirs so we don't have to re-enumerate them again in rmtree.
     for path in actual:

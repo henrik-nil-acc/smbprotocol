@@ -31,9 +31,7 @@ def _bytes_to_hex(bytes, pretty=False, hex_per_line=8):
             idx = hex_per_line * 2
             hex_list = [hex[i : i + idx] for i in range(0, len(hex), idx)]
 
-        hexes = []
-        for h in hex_list:
-            hexes.append(" ".join(h[i : i + 2] for i in range(0, len(h), 2)).upper())
+        hexes = [" ".join(h[i : i + 2] for i in range(0, len(h), 2)).upper() for h in hex_list]
         hex = "\n".join(hexes)
 
     return hex
@@ -44,9 +42,7 @@ def _indent_lines(string, prefix):
     def predicate(line):
         return line.strip()
 
-    lines = []
-    for line in string.splitlines(True):
-        lines.append(prefix + line if predicate(line) else line)
+    lines = [prefix + line if predicate(line) else line for line in string.splitlines(True)]
     return "".join(lines)
 
 
@@ -451,12 +447,8 @@ class ListField(Field):
     def get_value(self):
         # Override default get_value() so we return a list with the actual
         # value, not the Field definition
-        list_value = []
         value = self._get_calculated_value(self.value) if callable(self.value) else self.value
-
-        for entry in value:
-            list_value.append(entry.get_value())
-        return list_value
+        return [entry.get_value() for entry in value]
 
     def _pack_value(self, value):
         data = b""

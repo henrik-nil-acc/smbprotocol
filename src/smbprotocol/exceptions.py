@@ -243,9 +243,7 @@ class SMBResponseException(SMBException, metaclass=_SMBErrorRegistry):
                 error_details.append(f"Flag: {flag}, Print Name: {print_name}, Substitute Name: {sub_name}")
 
             elif isinstance(detail, SMB2ShareRedirectErrorContext):
-                ip_addresses = []
-                for ip_addr in detail["ip_addr_move_list"].get_value():
-                    ip_addresses.append(ip_addr.get_ipaddress())
+                ip_addresses = [ip_addr.get_ipaddress() for ip_addr in detail["ip_addr_move_list"].get_value()]
 
                 resource_name = to_text(detail["resource_name"].get_value(), encoding="utf-16-le")
                 addresses = "', '".join(ip_addresses)

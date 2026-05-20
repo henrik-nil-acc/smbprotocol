@@ -70,9 +70,7 @@ try:
         response = compound_messages[i][1](request)
         responses.append(response)
 
-    dir_files = []
-    for dir_file in responses[1]:
-        dir_files.append(dir_file["file_name"].get_value().decode("utf-16-le"))
+    dir_files = [dir_file["file_name"].get_value().decode("utf-16-le") for dir_file in responses[1]]
 
     log.info("Directory '%s\\%s' contains the files: %s", share, dir_name, ", ".join(repr(file) for file in dir_files))
 
