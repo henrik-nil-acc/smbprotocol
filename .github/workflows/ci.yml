@@ -20,14 +20,24 @@ on:
     types:
     - published
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
     - name: Check out code
       uses: actions/checkout@v6
+      with:
+        persist-credentials: false
 
     - name: Build smbprotocol
       run: |
@@ -45,6 +55,7 @@ jobs:
     needs:
     - build
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -62,6 +73,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
 
     - uses: actions/setup-python@v6
       with:
@@ -95,22 +108,22 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: Unit Test Results (${{ matrix.os }} ${{ matrix.python-version }} ${{ matrix.python-arch }})
+        name: Unit Test Results (${{ matrix.os }} ${{ matrix.python-version }})
         path: ./junit/test-results.xml
 
     - name: Upload Coverage Results
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: Coverage Results (${{ matrix.os }} ${{ matrix.python-version }} ${{ matrix.python-arch }})
+        name: Coverage Results (${{ matrix.os }} ${{ matrix.python-version }})
         path: ./coverage.xml
 
     - name: Upload Coverage to codecov
       if: always()
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f  # v6
       with:
         files: ./coverage.xml
-        flags: ${{ steps.os.outputs.name }},py${{ matrix.python-version }},${{ matrix.python-arch }}
+        flags: ${{ steps.os.outputs.name }},py${{ matrix.python-version }}
         token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
@@ -118,6 +131,7 @@ jobs:
     needs:
     - test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
@@ -130,4 +144,4 @@ jobs:
 
     - name: Publish
       if: startsWith(github.event.release.tag_name, 'v')
-      uses: pypa/gh-action-pypi-publish@release/v1
+      uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # v1.14.0
