@@ -63,10 +63,10 @@ lib::setup::python_requirements() {
         --find-links ./dist \
         --verbose
 
-    echo "Installing dev dependencies"
+    echo "Installing test dependencies"
     # --group needs pip 25.1+ (PEP 735)
     python -m pip install "pip>=25.1"
-    python -m pip install --group dev
+    python -m pip install --group test
 
     if [ x"${GITHUB_ACTIONS}" = "xtrue" ]; then
         echo "::endgroup::"
