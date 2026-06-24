@@ -78,8 +78,7 @@ lib::sanity::run() {
         echo "::group::Running Sanity Checks"
     fi
 
-    python -m black . --check
-    python -m isort . --check-only
+    python -m pre_commit run --all-files --show-diff-on-failure
 
     if [ x"${GITHUB_ACTIONS}" = "xtrue" ]; then
         echo "::endgroup::"
