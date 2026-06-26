@@ -218,21 +218,20 @@ is sent out from the client so it can get very verbose.
 
 ## Testing
 
-To this module, you need to install some pre-requisites first. This can be done
-by running;
+To work on this module, you need to install some prerequisites first. This can
+be done by running:
 
 ```bash
-# Install in current environment.
-# Recommend to have virtual environment installed at .venv path.
-# Dependency groups need pip 25.1+.
-python -m pip install "pip>=25.1"
-pip install -e . --group dev
+uv venv
+# Activate it. On Windows use .venv\Scripts\activate instead.
+source .venv/bin/activate
+uv pip install -e . --group dev
 ```
 
-From there to run the basic tests run;
+From there, run the basic tests with:
 
 ```bash
-python -m pytest -v --cov smbprotocol --cov-report term-missing
+python -m pytest -v --cov smbprotocol --cov smbclient --cov-report term-missing
 ```
 
 Before sending the code for review, besides making sure all the test pass,

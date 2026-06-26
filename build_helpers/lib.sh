@@ -54,19 +54,27 @@ lib::setup::python_requirements() {
         echo "::group::Installing Python Requirements"
     fi
 
-    echo "Installing smbprotocol"
-    # Getting the version is important so that pip prioritises our local dist
-    python -m pip install build
-    PACKAGE_VERSION="$( python -c "import build.util; print(build.util.project_wheel_metadata('.').get('Version'))" )"
+    echo "Creating virtual environment"
+    uv venv
 
-    python -m pip install smbprotocol=="${PACKAGE_VERSION}" \
-        --find-links ./dist \
-        --verbose
+    if [ "$(expr substr $(uname -s) 1 5)" == "MINGW" ]; then
+        source .venv/Scripts/activate
+    else
+        source .venv/bin/activate
+    fi
+
+    echo "Installing smbprotocol from the built distribution"
+    shopt -s nullglob
+    wheels=( ./dist/*.whl )
+    shopt -u nullglob
+    if [ "${#wheels[@]}" -ne 1 ]; then
+        echo "Expected exactly one wheel in ./dist, found ${#wheels[@]}" >&2
+        return 1
+    fi
+    uv pip install "${wheels[0]}"
 
     echo "Installing dev dependencies"
-    # --group needs pip 25.1+ (PEP 735)
-    python -m pip install "pip>=25.1"
-    python -m pip install --group dev
+    uv pip install --group dev
 
     if [ x"${GITHUB_ACTIONS}" = "xtrue" ]; then
         echo "::endgroup::"

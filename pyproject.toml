@@ -37,14 +37,14 @@ homepage = "https://github.com/jborean93/smbprotocol"
 
 [dependency-groups]
 test = [
-    "pytest",
-    "pytest-cov",
-    "pytest-mock",
+    "pytest == 9.1.1",
+    "pytest-cov == 7.1.0",
+    "pytest-mock == 3.15.1",
 ]
 lint = [
     "black == 26.3.1",
     "isort == 8.0.1",
-    "pre-commit",
+    "pre-commit == 4.6.0",
 ]
 dev = [
     {include-group = "test"},

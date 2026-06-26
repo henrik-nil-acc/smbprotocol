@@ -29,10 +29,14 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v6
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: true
+        cache-dependency-glob: pyproject.toml
+
     - name: Build smbprotocol
-      run: |
-        python -m pip install build
-        python -m build
+      run: uv build
 
     - name: Upload built smbprotocol
       uses: actions/upload-artifact@v7
@@ -67,6 +71,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: true
+        cache-dependency-glob: pyproject.toml
+
     - uses: actions/download-artifact@v8
       with:
         name: artifact
@@ -90,6 +100,7 @@ jobs:
         fi
       env:
         PYTEST_ADDOPTS: --color=yes
+        UV_PYTHON: ${{ matrix.python-version }}
 
     - name: Upload Test Results
       if: always()
